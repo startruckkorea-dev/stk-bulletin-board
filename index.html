@@ -753,7 +753,7 @@ function showToast(msg) {
 async function loadUserInfo() {
   try {
     const res = await fetch(
-      'https://ehyosung.sharepoint.com/sites/STK-NAS/_api/SP.UserProfiles.PeopleManager/GetMyProperties',
+      'https://startruckkorea.sharepoint.com/sites/STK-NAS/_api/SP.UserProfiles.PeopleManager/GetMyProperties',
       { headers: { 'Accept': 'application/json;odata=verbose' }, credentials: 'include' }
     );
     const data = await res.json();
