@@ -471,11 +471,15 @@
     </div>
     <div class="category-tabs">
       <button class="tab active" onclick="filterCategory('전체', this)">전체</button>
-      <button class="tab" onclick="filterCategory('General', this)">General</button>
-      <button class="tab" onclick="filterCategory('IT 공지', this)">IT 공지</button>
+      <button class="tab" onclick="filterCategory('CEO Office', this)">CEO Office</button>
       <button class="tab" onclick="filterCategory('HR', this)">HR</button>
       <button class="tab" onclick="filterCategory('Compliance', this)">Compliance</button>
-      <button class="tab" onclick="filterCategory('Admin', this)">Admin</button>
+      <button class="tab" onclick="filterCategory('Sales', this)">Sales</button>
+      <button class="tab" onclick="filterCategory('CSP', this)">CSP</button>
+      <button class="tab" onclick="filterCategory('PMM', this)">PMM</button>
+      <button class="tab" onclick="filterCategory('F&C', this)">F&C</button>
+      <button class="tab" onclick="filterCategory('IT', this)">IT</button>
+      <button class="tab" onclick="filterCategory('General', this)">General</button>
     </div>
   </div>
 
@@ -530,11 +534,15 @@
         <div class="form-group">
           <label class="form-label">카테고리 *</label>
           <select class="form-select" id="writeCategory">
-            <option value="General">General</option>
-            <option value="IT 공지">IT 공지</option>
+            <option value="CEO Office">CEO Office</option>
             <option value="HR">HR</option>
             <option value="Compliance">Compliance</option>
-            <option value="Admin">Admin</option>
+            <option value="Sales">Sales</option>
+            <option value="CSP">CSP</option>
+            <option value="PMM">PMM</option>
+            <option value="F&C">F&C</option>
+            <option value="IT">IT</option>
+            <option value="General">General</option>
           </select>
         </div>
         <div class="form-group">
@@ -728,7 +736,7 @@ async function submitPost() {
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 function catClass(cat) {
-  const m = { 'General':'cat-general','IT 공지':'cat-it','HR':'cat-hr','Compliance':'cat-compliance','Admin':'cat-admin' };
+  const m = { 'General':'cat-general','IT':'cat-it','HR':'cat-hr','Compliance':'cat-compliance','CEO Office':'cat-admin','Sales':'cat-general','CSP':'cat-default','PMM':'cat-it','F&C':'cat-compliance' };
   return m[cat] || 'cat-default';
 }
 
