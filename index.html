@@ -753,13 +753,13 @@ function showToast(msg) {
 async function loadUserInfo() {
   try {
     const res = await fetch(
-      'https://startruckkorea.sharepoint.com/sites/STK-NAS/_api/SP.UserProfiles.PeopleManager/GetMyProperties',
+      'https://startruckkorea.sharepoint.com/sites/STK-NAS/_api/web/currentUser',
       { headers: { 'Accept': 'application/json;odata=verbose' }, credentials: 'include' }
     );
     const data = await res.json();
-    const props = data.d;
-    const name = props.DisplayName || '';
-    const email = props.Email || '';
+    const user = data.d;
+    const name = user.Title || '';
+    const email = user.Email || '';
     document.getElementById('writeName').value = name;
     document.getElementById('writeEmail').value = email;
     document.getElementById('commentName').value = name;
