@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>STK Bulletin Board</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 <style>
   :root {
     --navy: #1a3c6e;
@@ -870,22 +871,67 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-// ── Auto-fill user info from SharePoint ──
+// ── MSAL 자동 로그인 & 사용자 정보 가져오기 ──
+const msalConfig = {
+  auth: {
+    clientId: 'bb1e4097-adb4-4a6d-8674-3678af8eb895',
+    authority: 'https://login.microsoftonline.com/19cab1f5-21f4-44df-8ac6-96d6ca595203',
+    redirectUri: window.location.href.split('?')[0]
+  },
+  cache: { cacheLocation: 'sessionStorage' }
+};
+const msalInstance = new msal.PublicClientApplication(msalConfig);
+
 async function loadUserInfo() {
   try {
-    const res = await fetch(
-      'https://startruckkorea.sharepoint.com/sites/STK-NAS/_api/web/currentUser',
-      { headers: { 'Accept': 'application/json;odata=verbose' }, credentials: 'include' }
-    );
-    const data = await res.json();
-    const user = data.d;
-    const name = user.Title || '';
-    const email = user.Email || '';
+    await msalInstance.initialize();
+
+    // 리다이렉트 응답 처리
+    await msalInstance.handleRedirectPromise();
+
+    let account = msalInstance.getAllAccounts()[0];
+
+    if (!account) {
+      // 로그인 안 된 경우 → SSO Silent 시도
+      try {
+        const silentResult = await msalInstance.ssoSilent({
+          scopes: ['User.Read'],
+          loginHint: undefined
+        });
+        account = silentResult.account;
+        msalInstance.setActiveAccount(account);
+      } catch(e) {
+        // Silent 실패 시 → 팝업 로그인
+        try {
+          const popupResult = await msalInstance.loginPopup({ scopes: ['User.Read'] });
+          account = popupResult.account;
+          msalInstance.setActiveAccount(account);
+        } catch(e2) { return; }
+      }
+    } else {
+      msalInstance.setActiveAccount(account);
+    }
+
+    // Graph API로 사용자 정보 가져오기
+    const tokenRes = await msalInstance.acquireTokenSilent({
+      scopes: ['User.Read'],
+      account
+    });
+
+    const graphRes = await fetch('https://graph.microsoft.com/v1.0/me?$select=displayName,mail,userPrincipalName', {
+      headers: { 'Authorization': 'Bearer ' + tokenRes.accessToken }
+    });
+    const user = await graphRes.json();
+    const name = user.displayName || '';
+    const email = user.mail || user.userPrincipalName || '';
+
     document.getElementById('writeName').value = name;
     document.getElementById('writeEmail').value = email;
     document.getElementById('commentName').value = name;
     document.getElementById('commentEmail').value = email;
-  } catch(e) {}
+  } catch(e) {
+    console.log('MSAL error:', e);
+  }
 }
 
 // close on overlay click
